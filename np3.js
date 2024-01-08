@@ -4589,8 +4589,7 @@
                                                         type: "applepay"
                                                     }
                                                 });
-                                                window.dispatchEvent(e)
-												alert('ready!');
+                                                window.dispatchEvent(e, t.abrupt("return");
                                             })), i.on("click", (function(t) {
                                                 dt(t)
                                             })), tt.on("cancel", (function(t) {
