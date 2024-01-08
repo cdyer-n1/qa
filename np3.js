@@ -4833,9 +4833,6 @@
 					{
 						key: "abort",
                         value: function(t) {
-                            // if ("applepay" === this.type) 
-								// return "stripe" === this.processor && (tt.complete('fail'), tt);
-							nt = t.payment.token, pt.event = t;
 							var e = {
 								status: ApplePaySession.STATUS_FAILURE
 							};
