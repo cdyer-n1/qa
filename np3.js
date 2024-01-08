@@ -4836,6 +4836,7 @@
                             if ("applepay" === this.type) 
 								return "stripe" === this.processor && (tt.abort(), tt);
                         }
+					}, {
 						key: "abort",
 						 value: function(t) {
 
