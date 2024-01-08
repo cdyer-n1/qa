@@ -4829,17 +4829,18 @@
                                 n[t](e.content)
                             })), !0)
                         }
-                    }, {
+                    },
+					{
+						key: "abort",
+                        value: function(t) {
+                            if ("applepay" === this.type) 
+								return "stripe" === this.processor && (tt.complete('fail'), tt);
+                        }
+					},
+					{
                         key: "setPrice",
                         value: function(t) {
                             if (!t) return console.warn("NEON PAY: You must specify a price to set it"), !1;
-                            if ("applepay" === this.type) 
-								return "stripe" === this.processor && (tt.abort(), tt);
-                        }
-					}, {
-						key: "abort",
-						 value: function(t) {
-
                             if ("applepay" === this.type) return "stripe" === this.processor && tt ? (tt.update({
                                 total: {
                                     label: this.option.label,
