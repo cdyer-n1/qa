@@ -4319,7 +4319,7 @@
             function lt(t, e) {
                 var n = ft(),
                     r = new ApplePaySession(3, n);
-                dt(), r.onvalidatemerchant = function(n) {
+                dt(t), r.onvalidatemerchant = function(n) {
                     var o = function(t, e) {
                         return new Promise((function(n, r) {
                             var o = new XMLHttpRequest,
@@ -4356,11 +4356,12 @@
                 }, r.begin()
             }
 
-            function dt() {
+            function dt(a) {
                 var t = new CustomEvent("applepayButtonClick", {
                     detail: {
                         eventType: "applepayButtonClick",
-                        type: "applepay"
+                        type: "applepay",
+						args: a
                     }
                 });
                 return window.dispatchEvent(t)
@@ -4590,7 +4591,7 @@
                                                 });
                                                 window.dispatchEvent(e)
                                             })), i.on("click", (function(t) {
-                                                dt()
+                                                dt(t)
                                             })), tt.on("cancel", (function(t) {
                                                 t.complete("fail"), ht()
                                             })), tt.on("paymentmethod", (function(t) {
