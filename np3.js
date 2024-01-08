@@ -4589,8 +4589,7 @@
                                                         type: "applepay"
                                                     }
                                                 });
-                                                window.dispatchEvent(e, t.abrupt("return"));
-												console.log("apple pay stripe ready");
+                                                window.dispatchEvent(e);
                                             })), i.on("click", (function(t) {
                                                 dt(t)
                                             })), tt.on("cancel", (function(t) {
