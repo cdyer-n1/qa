@@ -4833,11 +4833,8 @@
                     },
 					{
 						key: "abort",
-                        value: function(t) {
-							var e = {
-								status: ApplePaySession.STATUS_FAILURE
-							};
-							r.completePayment(e)
+                        value: function() {
+							tt.abort();
                         }
 					},
 					{
