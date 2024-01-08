@@ -4590,6 +4590,7 @@
                                                     }
                                                 });
                                                 window.dispatchEvent(e)
+												alert('ready!');
                                             })), i.on("click", (function(t) {
                                                 dt(t)
                                             })), tt.on("cancel", (function(t) {
