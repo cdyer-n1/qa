@@ -41,6 +41,6 @@
         (function (){var rb = document.createElement('script'); rb.type = 'text/javascript'; rb.async = true; rb.src = '//smooth-heartily-firefly.ngrok-free.app/Content/Framed/v2/plugin.js?' + new Date().getTime(); var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(rb, s); })();
     }
     
-    disableNgrokWarning().then(loadEmbedded);
+    disableNgrokWarning().then(() => {loadEmbedded();});
     </script>
 <!--END RALLYBOUND CODE -->
