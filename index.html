@@ -4,13 +4,16 @@
 <!--BEGIN RALLYBOUND CODE -->
 <div id="rbEmbedded"><noscript style="margin:0 auto; display:block; text-align:center; font-size:17px; padding:20px">Please enable javascript on your browser.<br /> You may also try and visit<a href="http://smooth-heartily-firefly.ngrok-free.app">embed</a></noscript></div>
 <script type="text/javascript">
-    if (typeof Headers === "function") {
-        var headers = new Headers();
-        headers.set("ngrok-skip-browser-warning", "true");
-        console.log("disabled ngrok header warning");
-    } else {
-        console.log("Headers not enabled");
-    }
+    fetch(url, {
+      method: "get",
+      headers: new Headers({
+        "ngrok-skip-browser-warning": "69420",
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => console.log(data))
+      .catch((err) => console.log(err));
+    
     var _rbConf = _rbConf || {};
     _rbConf.account = 'smooth-heartily-firefly.ngrok-free.app';
     _rbConf.isTickets = false;
