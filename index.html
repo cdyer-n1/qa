@@ -7,6 +7,7 @@
     if (typeof Headers === "function") {
         var headers = new Headers();
         headers.set("ngrok-skip-browser-warning", "true");
+        console.log("disabled ngrok header warning");
     } else {
         console.log("Headers not enabled");
     }
