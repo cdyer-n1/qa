@@ -1,19 +1,43 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <h1>Hello, world!</h1>
+<style>
+  .accordion {
+  background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+  transition: 0.1s;
+}
+.active, .accordion:hover {
+  background-color: #ccc;
+}
+
+.panel {
+  padding: 0 18px;
+  background-color: white;
+  display: none;
+  overflow: hidden;
+}
+</style>
 <script>
 function accordianToggle() {
-  this.classList.toggle("active");
-  var panel = this.nextElementSibling;
-  if (panel.style.maxHeight) {
-    panel.style.maxHeight = null;
-  } else {
-    panel.style.maxHeight = panel.scrollHeight + 3000 + "px";
-  }
+  var panel = document.getElementById("content");
+    if (panel.style.display === "block") {
+          panel.style.display = "none";
+        } else {
+          panel.style.display = "block";
+        }
+    }
 }
 </script>
-<div class="accordian" style="text-align:center;" onclick="accordianToggle()">
-<span style="color:#ff6600;font-family:Compasse-Bold;font-size:x-large;">DONATE NOW</span>
+<button style="color:#ff6600;font-family:Compasse-Bold;font-size:x-large;" onclick="accordianToggle()">DONATE NOW</button>
+<div id="content" class="accordian" style="text-align:center;">
 <!--BEGIN RALLYBOUND CODE -->
 <div id="rbEmbedded"><noscript style="margin:0 auto; display:block; text-align:center; font-size:17px; padding:20px">Please enable javascript on your browser.<br /> You may also try and visit<a href="http://another-donation0425.qa.dev-rb.com">Another Donation0425</a></noscript></div>
 <script type="text/javascript">
