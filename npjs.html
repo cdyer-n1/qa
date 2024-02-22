@@ -1,19 +1,18 @@
 Welcome to my embedded page!
 <script>
-  console.log('load custom1');
-window.onerror = function(message, source, lineno, colno, error) {
-    // Check if the error message starts with the specific text
-    if (message.startsWith("Blocked a frame with origin")) {
-        console.error("Caught an error: ", message);
-        // Dump the stack trace if the error object is available
-        if (error && error.stack) {
-            console.error("Stack trace:", error.stack);
-        } else {
-            console.error("Error details: Source:", source, "Line:", lineno, "Column:", colno);
-        }
-    }
-    // Return false to allow the error to propagate as normal
-    return false;
+  window.onerror = function(message, source, lineno, colno, error) {
+      // Check if the error message starts with the specific text
+      if (message.startsWith("Blocked a frame with origin")) {
+          console.error("Caught an error: ", message);
+          // Dump the stack trace if the error object is available
+          if (error && error.stack) {
+              console.error("Stack trace:", error.stack);
+          } else {
+              console.error("Error details: Source:", source, "Line:", lineno, "Column:", colno);
+          }
+      }
+      // Return false to allow the error to propagate as normal
+      return false;
 };</script>
 <!--BEGIN RALLYBOUND CODE -->
 <div id="rbEmbedded"><noscript style="margin:0 auto; display:block; text-align:center; font-size:17px; padding:20px">Please enable javascript on your browser.<br /> You may also try and visit<a href="http://standwithpenguins.qa.dev-rb.com">StandWithPenguins</a></noscript></div>
