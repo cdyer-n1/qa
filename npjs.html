@@ -1,5 +1,7 @@
 Welcome to my embedded page!
-<script>window.addEventListener('message', function(event) {
+<script>
+  console.log('load custom');
+  window.addEventListener('message', function(event) {
   if (event.data.includes('Blocked a frame with origin')) {
     console.log('Error: Blocked a frame with origin');
     console.trace();
