@@ -1,0 +1,18 @@
+<html>
+	<head>
+	<script type="text/javascript">
+		if (window.addEventListener) {
+			window.addEventListener("message", handleMessage);
+		}
+		
+		function handleMessage(event) {
+			if (event.origin != "https://end.qa.dev-rb.com/keyboardsforkangaroos") return;
+			var dataFromChildIframe = event.data;
+			console.log(dataFromChildIframe);
+		}
+	</script>
+	</head>
+	<body>
+		<iframe src="https://end.qa.dev-rb.com/keyboardsforkangaroos/WidgetApi/UserAccountInfo?frameOrigin=https://cdyer-n1.github.io"></iframe>
+	</body>
+</html>
