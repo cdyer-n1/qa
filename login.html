@@ -6,7 +6,7 @@
 		}
 		
 		function handleMessage(event) {
-			if (event.origin != "pandas.qa.dev-rb.com") return;
+			if (event.origin != "https://pandas.qa.dev-rb.com") return;
 			var dataFromChildIframe = event.data;
 			console.log(dataFromChildIframe);
 		}
