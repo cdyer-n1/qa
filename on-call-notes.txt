@@ -1,0 +1,38 @@
+Specific Errors
+	General slowness
+		Refresh cache on event, try to only refresh the cache causing an issue first
+	Registrant grid very slow
+		Suggestion: Enable registrant grid snapshot for campaign
+			Supervisor>Settings>Advanced>Add/Update/Remove Config File Options
+				Enable 900
+				Enable 901
+				Enable 902	
+
+Log Insights
+	Log Groups
+		event-management-prod
+		payment-services-prod
+	Search for
+		GlobalCatch
+			For tracking down most common errors/exceptions
+		Exception
+			Otherwise
+	Filter by OrgID or EventID when possible
+	
+	Example Query 1
+		fields @timestamp, @message, @logStream, @log
+		| filter code = 'ActionExecuted'
+		| filter context.rUrl like 'sprocket'
+		| stats count() as total by bin(15m) as time, context.rUrl
+		| display time, context.rUrl, total
+	
+	Example Query 2
+			
+		fields @timestamp, @message
+		| filter @message like 'sprocket'
+		| parse @message '"HTTP_X_FORWARDED_FOR":"*"' as ip
+		| parse @message '"rUrl": "*"' as rurl
+		| filter rurl like 'users'
+		| display @timestamp, ip, rurl
+		| sort @timestamp desc
+		| limit 20
