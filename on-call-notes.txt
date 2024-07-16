@@ -36,3 +36,13 @@ Log Insights
 		| display @timestamp, ip, rurl
 		| sort @timestamp desc
 		| limit 20
+		
+	Example Query 3
+		fields @timestamp, @message, @logStream, @log
+		| filter code = 'ActionExecuted'
+		| filter context.rUrl like 'sprocket'
+		| stats 
+			count(if (context.rUrl like 'sprocket/auth/oauth2/refresh', 1, null)) as refreshes,
+			count(if (context.rUrl not like 'sprocket/auth/oauth2/refresh', 1, null)) as api_calls 
+		  by bin(15m) as time
+		| display time, refreshes, api_calls
