@@ -6,7 +6,7 @@ Specific Errors
 			Supervisor>Settings>Advanced>Add/Update/Remove Config File Options
 				Enable 900 (snapshot)
 				Enable 901 (update snapshot on member update)
-				Enable 902 (update snapshot 5min)
+				Enable 902 (update snapshot 5min) alternate 903 for 30min
 			Refresh page, scroll down, take first snapshot manually
 
 Log Insights
