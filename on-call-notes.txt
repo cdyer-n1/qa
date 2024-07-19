@@ -4,9 +4,9 @@ Specific Errors
 	Registrant grid very slow
 		Suggestion: Enable registrant grid snapshot for campaign
 			Supervisor>Settings>Advanced>Add/Update/Remove Config File Options
-				Enable 900
-				Enable 901
-				Enable 902	
+				Enable 900 (snapshot)
+				Enable 901 (update snapshot on member update)
+				Enable 902 (update snapshot 5min)
 			Refresh page, scroll down, take first snapshot manually
 
 Log Insights
