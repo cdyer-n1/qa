@@ -102,20 +102,20 @@
             <p>This is a simple mock website layout that includes an iframe for testing.</p>
 
             <!-- Iframe -->
-        <!--BEGIN RALLYBOUND CODE -->
-        <div id="rbEmbedded"><noscript style="margin:0 auto; display:block; text-align:center; font-size:17px; padding:20px">Please enable javascript on your browser.<br /> You may also try and visit<a href="http://platformsvet.qa.dev-rb.com/embedded">Embedded</a></noscript></div>
-        <script type="text/javascript">
-            var _rbConf = _rbConf || {};
-            _rbConf.account = 'platformsvet.qa.dev-rb.com/embedded';
-            _rbConf.isTickets = false;
-            _rbConf.frameName = 'rbDon';
-            _rbConf.otherParams = {};
-            _rbConf.tryApplePay = false;
-            //_rbConf.defaultAmount = 100; // optional
-            _rbConf.onDonation = function(donationAmount, donationId, donationRecurringId){console.log("donation made, this is invoked from the embed code!"}; // optional
-            (function (){var rb = document.createElement('script'); rb.type = 'text/javascript'; rb.async = true; rb.src = '//cdn-qa.rallybound.com/Content/Framed/v2/plugin.js?' + new Date().getTime(); var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(rb, s); })();
-        </script>
-        <!--END RALLYBOUND CODE -->
+            <!--BEGIN RALLYBOUND CODE -->
+            <div id="rbEmbedded"><noscript style="margin:0 auto; display:block; text-align:center; font-size:17px; padding:20px">Please enable javascript on your browser.<br /> You may also try and visit<a href="http://platformsvet.qa.dev-rb.com/embedded">Embedded</a></noscript></div>
+            <script type="text/javascript">
+                var _rbConf = _rbConf || {};
+                _rbConf.account = 'platformsvet.qa.dev-rb.com/embedded';
+                _rbConf.isTickets = false;
+                _rbConf.frameName = 'rbDon';
+                _rbConf.otherParams = {};
+                _rbConf.tryApplePay = false;
+                //_rbConf.defaultAmount = 100; // optional
+                _rbConf.onDonation = function(donationAmount, donationId, donationRecurringId){console.log("donation made, this is invoked from the embed code!"}; // optional
+                (function (){var rb = document.createElement('script'); rb.type = 'text/javascript'; rb.async = true; rb.src = '//cdn-qa.rallybound.com/Content/Framed/v2/plugin.js?' + new Date().getTime(); var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(rb, s); })();
+            </script>
+            <!--END RALLYBOUND CODE -->
         </div>
     </div>
 
