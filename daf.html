@@ -60,7 +60,7 @@
                     textTransform: "none"}
             };
 
-            var card = neonpay.createField('daf', {customerDetail: {firstName: 'Test', test: 'test', amount: 1000}});
+            var card = neonpay.createField('daf', { customerDetail: { amount: 0.00 } });
             //var card = neonpay.createField('daf');
 			document.querySelector('#amount').addEventListener('input', changePrice);
 	var changePrice = function () {
