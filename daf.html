@@ -84,7 +84,7 @@
 				
 			  if (result) {
 				card.mount('#paymentForm');
-				  document.getElementById('<%= mountedChariotDafPayElem %>').onclick = changePrice;
+				  document.getElementById('#paymentForm').onclick = changePrice;
 			  } else {
 				  // There was an error and the payment is not possible for this configuration
 				  container.style.display = 'none';
