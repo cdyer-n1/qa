@@ -65,7 +65,7 @@
 			document.querySelector('#amount').addEventListener('input', changePrice);
 	var changePrice = function () {
 		var price = document.querySelector('#amount').value;
-		var integerAmount = typeof price !== 'undefined' ? parseInt(amount.toString()): -1;
+		var integerAmount = typeof price !== 'undefined' ? parseInt(price.toString()): -1;
 	        if (isNaN(integerAmount)) {
 	          console.log('Invalid price input');
 	          return;
