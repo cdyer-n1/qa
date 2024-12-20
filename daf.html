@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+		<!--<script src="https://cdn.sbx.neononepay.com/3.2/neonpay.js"></script>-->
+        <script src="https://cdn.uat.neononepay.com/3.2/neonpay.js"></script>
+		<!--<script src="https://neonpay-js-dev.s3.amazonaws.com/3.2/neonpay.js"></script>-->
+    </head>
+    <body>
+        <div class="container">
+        <form id="theForm" action="#" method="POST">
+            <h2>Chariot</h2>
+			<input type="text" id="amount">
+            <button id="setPrice" type="button" name="amount" onclick="changePrice()">Set Price</button>
+            <div id="paymentForm" style="height: 44px;"></div>
+            <div id="error"></div>
+			<textarea disabled="disabled" id="token" style="width: 500px; height: 300px;"></textarea>
+        </form>
+    </div>
+        <script type="text/javascript">
+            //var neonpay = new NeonPay('public_1a43c17e16489c529b0784d360ad566cae7055ce4e7f589d5f1a06ed', 15, {swipe: true});	
+         //  var neonpay = new NeonPay('public_c01347e8047d3623b32755a220291c1149384057dfb107508cccba09', '4584', {swipe: true}); // dev payrix (Test Application: App ID 2)
+			//var neonpay = new NeonPay('public_3fa2daeb5df9978f75bcb3e2da5b7eff6ed434d4239b784d31fac25f', '9', {swipe: true}); // dev payrix {APP ID : 
+			//var neonpay = new NeonPay('public_c01347e8047d3623b32755a220291c1149384057dfb107508cccba09', '4573', {swipe: true}); // dev stripe US
+			//var neonpay = new NeonPay('public_ca648079251263cd4a42d65730955cedebf17aac6ec46a9777cb0a04', '4709', {swipe: true}); // dev stripe canada
+			var neonpay = new NeonPay('public_d43ac11206bee0632dcce3578d33c69e3f1e10ffe46bc29c34c61627', 2905, {swipe: true}); // uat Niki2898
+			 //var neonpay = new NeonPay('public_d43ac11206bee0632dcce3578d33c69e3f1e10ffe46bc29c34c61627', 2700, {swipe: true}); // uat Niki stripe Canada
+			//var neonpay = new NeonPay('public_40825f53272d118b447b96e66b263cf7334e462274f233aa51e2611f', 261482, {swipe: true}); // sbx Niki
+             var customStyle = {
+                 base: {
+                     border: 0,
+                     color: 'red',
+                     display: 'dotted',
+                     fontFamily: 'verdana',
+                     '::placeholder': {
+                         color: '#000'
+                     },
+                     '::before': {
+                         color: '#000'
+                     }
+                 }, 
+                 invalid: {
+                     color: 'yellow'
+                 }}; 
+            var customStyle = {
+                base:{
+                    color: "rgb(51, 51, 51)",
+                    fontFamily: "Heebo, sans-serif",
+                    fontSize: "20px",
+                    fontSmoothing: undefined,
+                    fontStyle: "normal",
+                    fontVariant: "normal",
+                    iconColor: undefined,
+                    letterSpacing: "normal",
+                    textAlign: "start",
+                    textDecoration: "none solid rgb(51, 51, 51)",
+                    textShadow: "none",
+                    textTransform: "none"}
+            };
+
+            var card = neonpay.createField('daf', {customerDetail: {firstName: 'Test', test: 'test', amount: 1000}});
+            //var card = neonpay.createField('daf');
+			
+			var changePrice = function () {
+				var price = document.querySelector('#amount').value;
+        var numericPrice = parseFloat(price);
+        if (isNaN(numericPrice)) {
+          console.log('Invalid price input');
+          return;
+        }
+
+        var fixedPrice = numberPrice.toFixed(0);
+        
+				console.log(`setting price to ${fixedPrice}`);
+				card.setPrice(fixedPrice);
+			};
+			
+			(async () => {
+			  // Check if merchant can process payments first
+		  	  const result = await neonpay.canMakePayments();
+			  console.log(result);
+				
+			  if (result) {
+				card.mount('#paymentForm');
+			  } else {
+				  // There was an error and the payment is not possible for this configuration
+				  container.style.display = 'none';
+			  }
+			})();
+            // card.on('blur', () => {console.log('blurring');});
+            card.on('change', function(event) {
+				console.log(event);
+                var displayError = document.getElementById('error');
+                if (event.error) {
+                    displayError.innerHTML = event.error.message;
+                } else {
+                    displayError.innerHTML = '';
+                }
+            });
+            card.on('ready', function (event) {
+				console.log('ready');
+                card.updateField({style: {base: {color: 'pink'}}});
+            });
+            var displayError = document.getElementById('error');
+            
+            var form = document.getElementById('theForm');
+            var tokenField = document.getElementById('token');
+            var tokenData = {
+                first_name: 'Robert',
+                middle_name: 'Norman',
+                last_name: 'Ross',
+                email: 'bob@ross.net',
+                phone: '+18888606366',
+                address_line_1: '4545 N. Ravenswood Ave.',
+                address_line_2: '2nd Floor',
+                address_city: 'Chicago',
+                address_state: 'IL',
+                address_zip: '60640',
+                address_country: 'US'
+            };
+            card.on('dafAuthorized', function (event) {
+				document.querySelector('#token').innerHTML = JSON.stringify(event);
+				console.log(event);
+            }); 
+            card.on('dafCanceled', function (event) {
+				console.log('dafCanceled');
+				console.log(event);
+            }); 
+        </script>
+    </body>
+</html>
