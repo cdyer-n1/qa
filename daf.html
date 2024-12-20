@@ -70,7 +70,7 @@
 	          console.log('Invalid price input');
 	          return;
 	        }
-		var amountWithoutCommas = amount.replace(/,/g, '');
+		var amountWithoutCommas = price.replace(/,/g, '');
 		var fAmnt = (Math.floor(parseFloat(amountWithoutCommas) * 100) / 100);
 	        var fixedPrice = fAmnt.toFixed(0);
 		console.log(`setting price to ${fixedPrice}`);
