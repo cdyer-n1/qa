@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Liquid Sandbox</title>
+  <script src="https://unpkg.com/liquidjs/dist/liquid.browser.umd.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 2rem;
+      background: #f9f9f9;
+    }
+    textarea, pre {
+      width: 100%;
+      padding: 1rem;
+      font-family: monospace;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    textarea {
+      height: 150px;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      background: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #004999;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Liquid Template Sandbox</h1>
+
+  <label for="template">Liquid Template:</label>
+  <textarea id="template">
+Hello, {{ name }}!
+Today is {{ date | date: "%A, %B %d, %Y" }}.
+  </textarea>
+
+  <label for="context">JSON Context:</label>
+  <textarea id="context">
+{
+  "name": "MyName",
+  "date": "2025-04-14"
+}
+  </textarea>
+
+  <button onclick="render()">Render</button>
+
+  <h2>Rendered Output:</h2>
+  <pre id="output"></pre>
+
+  <script>
+    const engine = new liquidjs.Liquid();
+
+    async function render() {
+      const template = document.getElementById('template').value;
+      const contextRaw = document.getElementById('context').value;
+
+      let context;
+      try {
+        context = JSON.parse(contextRaw);
+      } catch (e) {
+        document.getElementById('output').textContent = '❌ JSON Parse Error: ' + e.message;
+        return;
+      }
+
+      try {
+        const html = await engine.parseAndRender(template, context);
+        document.getElementById('output').textContent = html;
+      } catch (e) {
+        document.getElementById('output').textContent = '❌ Liquid Render Error: ' + e.message;
+      }
+    }
+  </script>
+
+</body>
+</html>
