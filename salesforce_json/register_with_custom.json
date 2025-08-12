@@ -1,0 +1,143 @@
+{
+  "TS": "2025-07-23 14:37:33.1223",
+  "CODE": "SalesforceRequest",
+  "LOGGER": "SalesforceRestClient",
+  "LEVEL": "Info",
+  "Count": "1",
+  "Data": [
+    {
+      "Opportunity": {
+        "RB_Fields": {
+          "DonorRole": "Donor",
+          "GiftType": "One Time Gift",
+          "PaymentProcessor": "NeonPay",
+          "ProcessorTransactionId": "npcharge_7981738b3a89972ee44f6e6925c956c8",
+          "Authorization": "t1_txn_68812be3e5cab48f033183b",
+          "CcNumber": "************1111",
+          "CcCardType": "Visa",
+          "ExpMonth": "12",
+          "ExpYear": "2032",
+          "PaymentRecordType": "Credit Card",
+          "PaymentType": "Credit Card",
+          "CurrencyIsoCode": "USD",
+          "IsCompanyDonation": false,
+          "NameOnPaymentMethod": "reg ister"
+        },
+        "RB_Objects": {
+          "Donor": {
+            "RB_Fields": {
+              "CampaignMemberId": "3:2315",
+              "MainFieldsSubmitted": true,
+              "AddressSubmitted": true,
+              "CustomFieldsSubmitted": true,
+              "RemoveOnUpdate": [
+                "LeadSource"
+              ]
+            },
+            "RB_Objects": {
+              "Account": {
+                "RB_Fields": {},
+                "RB_Objects": {},
+                "account__c": "a"
+              },
+              "CampaignMember": {
+                "RB_Fields": {},
+                "RB_Objects": {},
+                "rallybound__Is_Donor__c": true,
+                "campaignMember__c": "a",
+                "campaignMember_donor__c": "a"
+              }
+            },
+            "FirstName": "reg",
+            "LastName": "ister",
+            "Email": "myregister01@example.com",
+            "MailingStreet": "1 Roadville Road",
+            "MailingCity": "Roadville",
+            "MailingState": "AZ",
+            "MailingPostalCode": "11111",
+            "MailingCountry": "UNITED STATES",
+            "rallybound__Member_ID__c": 2315,
+            "rallybound__User_Account_ID__c": 1002242,
+            "contact_field__c": "a"
+          },
+          "Campaign": {
+            "RB_Fields": {},
+            "RB_Objects": {
+              "ParentCampaign": {
+                "RB_Fields": {},
+                "RB_Objects": {
+                  "ParentCampaign": {
+                    "RB_Fields": {},
+                    "RB_Objects": {},
+                    "rallybound__RallyBound_GoalID__c": 3
+                  }
+                },
+                "Name": "created team",
+                "Type": "Peer-to-peer team",
+                "Status": "In Progress",
+                "ExpectedRevenue": 100,
+                "rallybound__RallyBound_GoalID__c": 2057,
+                "rallybound__RallyBound_Personal_Page__c": "https://simple.rallybound.dev/Team/View/13/created-team",
+                "campaign_team__c": "a"
+              }
+            },
+            "Name": "awesome",
+            "Type": "Peer-to-peer member",
+            "Status": "In Progress",
+            "ExpectedRevenue": 123,
+            "rallybound__RallyBound_GoalID__c": 2056,
+            "rallybound__RallyBound_Personal_Page__c": "https://simple.rallybound.dev/Member/MyPage/2315/reg-ister",
+            "campaign_member__c": "a"
+          },
+          "OpportunityLineItems": [
+            {
+              "RB_Fields": {},
+              "PricebookEntryId": "hij",
+              "Description": "Registration - reg ister",
+              "Quantity": 1,
+              "UnitPrice": 5,
+              "lineitem__c": "a"
+            },
+            {
+              "RB_Fields": {},
+              "PricebookEntryId": "abc",
+              "Description": "Registration Donation",
+              "Quantity": 1,
+              "UnitPrice": 4,
+              "lineitem__c": "a"
+            }
+          ]
+        },
+        "Name": "SimplePlatform Registrations / Donation",
+        "Description": "",
+        "Amount": 9,
+        "CloseDate": "U2025-07-23 18:37:00",
+        "StageName": "Closed Won",
+        "rallybound__RallyBound_PaymentID__c": 2419,
+        "donation_field__c": "a"
+      },
+      "QueueId": 1144,
+      "Action": "syncDonation",
+      "Settings": {
+        "SalesforceType": 2,
+        "UseStateCode": false,
+        "OverwriteAddress": false,
+        "ContactFindModeType": 1,
+        "SoftCreditRole": "Soft Credit",
+        "TributeNotifyRole": "Honor",
+        "Type": 3,
+        "CampaignID": 3,
+        "UseBasicRecurringDonation": false,
+        "UseAdvancedRecurringDonation": true,
+        "CreateOrganizationAccounts": false,
+        "AlwaysPushRsvpOnly": false,
+        "AddRsvpOnlyToHousehold": false,
+        "AddRsvpOnlyToHouseholdByName": false,
+        "DebugMode": 4,
+        "AllowNewObjOnSfMatchingFind": false,
+        "OverwriteAccountName": false,
+        "SetDonorAsPrimaryContactForCompanyDonations": false
+      }
+    }
+  ]
+}

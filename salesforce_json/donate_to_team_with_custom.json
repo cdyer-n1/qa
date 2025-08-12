@@ -1,0 +1,125 @@
+{
+  "TS": "2025-07-23 15:42:59.5175",
+  "CODE": "SalesforceRequest",
+  "LOGGER": "SalesforceRestClient",
+  "LEVEL": "Info",
+  "Count": "1",
+  "Data": [
+    {
+      "Opportunity": {
+        "RB_Fields": {
+          "DonorRole": "Donor",
+          "Anonymous": false,
+          "GiftType": "One Time Gift",
+          "PaymentProcessor": "NeonPay",
+          "ProcessorTransactionId": "npcharge_1f7c09d85d0026e0112d2645292b0c8e",
+          "Authorization": "t1_txn_68813b3dc9ff5c76fc9702a",
+          "CcNumber": "************1111",
+          "CcCardType": "Visa",
+          "ExpMonth": "12",
+          "ExpYear": "2032",
+          "PaymentRecordType": "Credit Card",
+          "PaymentType": "Credit Card",
+          "CurrencyIsoCode": "USD",
+          "IsCompanyDonation": false,
+          "NameOnPaymentMethod": "Person Name"
+        },
+        "RB_Objects": {
+          "Donor": {
+            "RB_Fields": {
+              "CampaignMemberId": "3:2323",
+              "MainFieldsSubmitted": true,
+              "AddressSubmitted": true,
+              "CustomFieldsSubmitted": true,
+              "RemoveOnUpdate": [
+                "LeadSource"
+              ]
+            },
+            "RB_Objects": {
+              "Account": {
+                "RB_Fields": {},
+                "RB_Objects": {},
+                "account__c": "a"
+              },
+              "CampaignMember": {
+                "RB_Fields": {},
+                "RB_Objects": {},
+                "rallybound__Is_Donor__c": true,
+                "campaignMember__c": "a",
+                "campaignMember_donor__c": "a"
+              }
+            },
+            "FirstName": "Rizzo",
+            "LastName": "Altocumulus",
+            "Email": "RizzoAltocumulus0723@example.test",
+            "MailingStreet": "34 Roadville Road",
+            "MailingCity": "Roadville",
+            "MailingState": "RI",
+            "MailingPostalCode": "12345",
+            "MailingCountry": "UNITED STATES",
+            "rallybound__Member_ID__c": 2323,
+            "rallybound__User_Account_ID__c": 1002249,
+            "contact_field__c": "a"
+          },
+          "Campaign": {
+            "RB_Fields": {},
+            "RB_Objects": {
+              "ParentCampaign": {
+                "RB_Fields": {},
+                "RB_Objects": {},
+                "rallybound__RallyBound_GoalID__c": 3
+              }
+            },
+            "Name": "team2!",
+            "Type": "Peer-to-peer team",
+            "Status": "In Progress",
+            "ExpectedRevenue": 100,
+            "rallybound__RallyBound_GoalID__c": 1031,
+            "rallybound__RallyBound_Personal_Page__c": "https://simple.rallybound.dev/Team/View/10/team2",
+            "campaign_team__c": "a"
+          },
+          "OpportunityLineItems": [
+            {
+              "RB_Fields": {},
+              "PricebookEntryId": "abc",
+              "Description": "Donation",
+              "Quantity": 1,
+              "UnitPrice": 40,
+              "lineitem__c": "a"
+            }
+          ]
+        },
+        "Name": "SimplePlatform Donation",
+        "Description": "",
+        "Amount": 40,
+        "CloseDate": "U2025-07-23 19:42:51",
+        "StageName": "Closed Won",
+        "rallybound__RallyBound_DonationID__c": 2462,
+        "rallybound__RallyBound_PaymentID__c": 2426,
+        "donation_field__c": "a"
+      },
+      "QueueId": 1148,
+      "Action": "syncDonation",
+      "Settings": {
+        "SalesforceType": 2,
+        "UseStateCode": false,
+        "OverwriteAddress": false,
+        "ContactFindModeType": 1,
+        "SoftCreditRole": "Soft Credit",
+        "TributeNotifyRole": "Honor",
+        "Type": 1,
+        "CampaignID": 3,
+        "UseBasicRecurringDonation": false,
+        "UseAdvancedRecurringDonation": true,
+        "CreateOrganizationAccounts": false,
+        "AlwaysPushRsvpOnly": false,
+        "AddRsvpOnlyToHousehold": false,
+        "AddRsvpOnlyToHouseholdByName": false,
+        "DebugMode": 4,
+        "AllowNewObjOnSfMatchingFind": false,
+        "OverwriteAccountName": false,
+        "SetDonorAsPrimaryContactForCompanyDonations": false
+      }
+    }
+  ]
+}

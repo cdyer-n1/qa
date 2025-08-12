@@ -1,0 +1,91 @@
+{
+  "TS": "2025-07-23 15:54:32.7854",
+  "CODE": "SalesforceRequest",
+  "LOGGER": "SalesforceRestClient",
+  "LEVEL": "Info",
+  "Count": "1",
+  "Data": [
+    {
+      "Contact": {
+        "RB_Fields": {
+          "CampaignMemberId": "3:2325",
+          "MainFieldsSubmitted": true,
+          "AddressSubmitted": true,
+          "CustomFieldsSubmitted": true,
+          "RemoveOnUpdate": [
+            "LeadSource"
+          ]
+        },
+        "RB_Objects": {
+          "Account": {
+            "RB_Fields": {},
+            "RB_Objects": {},
+            "account__c": "a"
+          },
+          "CampaignMember": {
+            "RB_Fields": {},
+            "RB_Objects": {},
+            "rallybound__Is_Attending__c": false,
+            "rallybound__Is_Fundraiser__c": true,
+            "rallybound__Is_On_Team__c": true,
+            "rallybound__Is_Team_Captain__c": false,
+            "campaignMember__c": "a",
+            "campaignmember_registrant__c": "a"
+          },
+          "Campaign": {
+            "RB_Fields": {
+              "ContactLookupMemberId": 2325,
+              "ContactLookupUserAccountId": 1002251
+            },
+            "RB_Objects": {
+              "ParentCampaign": {
+                "RB_Fields": {},
+                "RB_Objects": {},
+                "rallybound__RallyBound_GoalID__c": 1007
+              }
+            },
+            "Name": "my fundraising campaign",
+            "Type": "Peer-to-peer member",
+            "Status": "In Progress",
+            "ExpectedRevenue": 100,
+            "rallybound__RallyBound_GoalID__c": 2058,
+            "rallybound__RallyBound_Personal_Page__c": "https://simple.rallybound.dev/campaign1010101",
+            "campaign_member__c": "a"
+          }
+        },
+        "FirstName": "reg",
+        "LastName": "no1",
+        "Email": "regnodonation@example.com",
+        "MailingStreet": "1 Roadville Road",
+        "MailingCity": "Roadville",
+        "MailingState": "IL",
+        "MailingPostalCode": "11111",
+        "MailingCountry": "UNITED STATES",
+        "rallybound__Member_ID__c": 2325,
+        "rallybound__User_Account_ID__c": 1002251,
+        "contact_field__c": "a"
+      },
+      "QueueId": 1150,
+      "Action": "syncRegistration",
+      "Settings": {
+        "SalesforceType": 2,
+        "UseStateCode": false,
+        "OverwriteAddress": false,
+        "ContactFindModeType": 1,
+        "SoftCreditRole": "Soft Credit",
+        "TributeNotifyRole": "Honor",
+        "CampaignID": 3,
+        "UseBasicRecurringDonation": false,
+        "UseAdvancedRecurringDonation": true,
+        "CreateOrganizationAccounts": false,
+        "AlwaysPushRsvpOnly": false,
+        "AddRsvpOnlyToHousehold": false,
+        "AddRsvpOnlyToHouseholdByName": false,
+        "DebugMode": 4,
+        "AllowNewObjOnSfMatchingFind": false,
+        "OverwriteAccountName": false,
+        "SetDonorAsPrimaryContactForCompanyDonations": false
+      }
+    }
+  ]
+}
