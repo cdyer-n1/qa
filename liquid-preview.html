@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liquid Template Preview Tool</title>
+    <script src="https://cdn.jsdelivr.net/npm/liquidjs/dist/liquid.browser.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -66,15 +67,53 @@
             grid-column: 1 / -1;
         }
         
-        textarea {
-            width: 100%;
-            min-height: 300px;
-            padding: 12px;
+        .editor-wrapper {
+            display: flex;
             border: 1px solid #ddd;
             border-radius: 4px;
+            background: white;
+            height: 400px;
+            resize: vertical;
+            overflow: hidden;
+        }
+        
+        .line-numbers {
+            background: #f5f5f5;
+            color: #999;
+            padding: 12px 8px;
+            text-align: right;
             font-family: 'Courier New', monospace;
             font-size: 13px;
-            resize: vertical;
+            line-height: 1.5;
+            user-select: none;
+            min-width: 50px;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+            overflow-x: hidden;
+            white-space: pre;
+            height: 100%;
+        }
+        
+        .line-numbers::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .line-numbers {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        textarea {
+            flex: 1;
+            height: 100%;
+            padding: 12px;
+            border: none;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            resize: none;
+            line-height: 1.5;
+            outline: none;
+            overflow-y: auto;
         }
         
         .button-group {
@@ -231,11 +270,12 @@
         
         <div class="panel full-width">
             <h2>Template HTML</h2>
-            <textarea id="template-input" placeholder="Paste your email template HTML here (with Liquid macros like {{User.First_Name}})..."></textarea>
+            <div class="editor-wrapper">
+                <div class="line-numbers" id="line-numbers"></div>
+                <textarea id="template-input" placeholder="Paste your email template HTML here (with Liquid macros like {{User.First_Name}})..."></textarea>
+            </div>
             <div class="button-group">
                 <button class="primary" onclick="parseTemplate()">Parse Template</button>
-                <button class="secondary" onclick="loadSample('welcome')">Load Welcome Email Sample</button>
-                <button class="secondary" onclick="loadSample('form')">Load Form Confirmation Sample</button>
                 <button class="success" onclick="exportHTML()">Export Rendered HTML</button>
             </div>
         </div>
@@ -261,7 +301,7 @@
             </div>
             
             <div class="panel">
-                <h2>Live Preview</h2>
+                <h2>Preview</h2>
                 <div class="button-group">
                     <button class="primary" onclick="updatePreview()">Update Preview</button>
                     <button class="secondary" onclick="openInNewWindow()">Open in New Window</button>
@@ -274,75 +314,207 @@
     </div>
     
     <script>
+        const { Liquid } = window.liquidjs;
+        const engine = new Liquid();
+        
+        // Register custom filters
+        engine.registerFilter('money', (value) => {
+            if (typeof value === 'string') {
+                // If already formatted, return as-is
+                if (value.startsWith('$')) return value;
+                // Try to parse as number
+                const num = parseFloat(value.replace(/[^0-9.-]/g, ''));
+                if (!isNaN(num)) {
+                    return '$' + num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+                }
+                return value;
+            }
+            if (typeof value === 'number') {
+                return '$' + value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+            }
+            return value;
+        });
+        
+        engine.registerFilter('field_by_api_name', (user, fieldName) => {
+            // Direct property access - fields are on user object
+            return user?.[fieldName] || '';
+        });
+        
+        engine.registerFilter('field_name', (obj, fieldName) => {
+            // Direct property access - fields are on object
+            return obj?.[fieldName] || '';
+        });
+        
         let currentTemplate = '';
         let macroValues = {};
-        let samples = {
-            welcome: null,
-            form: null
-        };
         
-        // Sample data presets
-        const sampleData = {
-            'User.First_Name': 'John',
-            'User.Last_Name': 'Smith',
-            'User.Email': 'john.smith@example.com',
-            'Primary_Registrant.First_Name': 'John',
-            'Primary_Registrant.Last_Name': 'Smith',
-            'Primary_Registrant.Registration_Fields | field_name: "Commitment Amount" | money': '$5,000',
-            'Primary_Registrant.Registration_Fee | money': '$350',
-            'Donation.Amount | money': '$100',
-            'Payment.Amount_As_Money': '$450',
-            'User | field_by_api_name: "EmergencyContactName"': 'Jane Smith',
-            'User | field_by_api_name: "EmergencyContactRelationship"': 'Spouse',
-            'User | field_by_api_name: "EmergencyContactCellPhone"': '555-1234',
-            'User | field_by_api_name: "B4CJerseySize"': 'Large',
-            'User | field_by_api_name: "TshirtSize"': 'Large',
-            'User | field_by_api_name: "BibShortsSize"': 'Large',
-            'User | field_by_api_name: "BibShortsInseam"': 'Regular',
-            'User | field_by_api_name: "GloveSize"': 'Large',
-            'User | field_by_api_name: "WaterBottle"': 'Yes',
-            'User | field_by_api_name: "AverageSpeed"': '15-17 mph',
-            'User | field_by_api_name: "FirstNightRoomType"': 'Single',
-            'User | field_by_api_name: "FirstNightRoommateRequest"': 'N/A',
-            'User | field_by_api_name: "RequireTransportation"': 'Yes',
-            'User | field_by_api_name: "DepartureLocation"': 'Brooklyn',
-            'User | field_by_api_name: "RequireTransportationHome"': 'Yes',
-            'User | field_by_api_name: "ReturnLocation"': 'Brooklyn',
-            'User | field_by_api_name: "RequireBikeTransportation"': 'Yes',
-            'User | field_by_api_name: "BikeDropOffLocation"': 'Lakewood',
-            'User | field_by_api_name: "RequireBikeTransportationHome"': 'Yes',
-            'User | field_by_api_name: "BikeReturnLocation"': 'Lakewood',
-            'userAddress.Address1': '123 Main Street',
-            'userAddress.Address2': 'Apt 4B',
-            'userAddress.City': 'Brooklyn',
-            'userAddress.State': 'NY',
-            'userAddress.Zip': '11230'
-        };
-        
-        function extractLiquidMacros(html) {
-            // Match Liquid syntax: {{...}}, {%...%}, and complex expressions
-            const simplePattern = /\{\{([^}]+)\}\}/g;
-            const tagPattern = /\{%([^%]+)%\}/g;
+        // Update line numbers when content changes
+        function updateLineNumbers() {
+            const textarea = document.getElementById('template-input');
+            const lineNumbers = document.getElementById('line-numbers');
+            const lines = textarea.value.split('\n').length;
             
-            const macros = new Set();
+            let lineNumbersText = '';
+            for (let i = 1; i <= lines; i++) {
+                lineNumbersText += i + '\n';
+            }
+            lineNumbers.textContent = lineNumbersText;
+        }
+        
+        // Sync scroll between line numbers and textarea
+        function syncScroll() {
+            const textarea = document.getElementById('template-input');
+            const lineNumbers = document.getElementById('line-numbers');
+            lineNumbers.scrollTop = textarea.scrollTop;
+        }
+        
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const textarea = document.getElementById('template-input');
+            updateLineNumbers();
+            
+            // Add event listeners
+            textarea.addEventListener('input', updateLineNumbers);
+            textarea.addEventListener('paste', function() {
+                setTimeout(updateLineNumbers, 0);
+            });
+            textarea.addEventListener('scroll', syncScroll);
+        });
+        
+        // Sample data presets - custom fields directly on objects
+        const sampleDataDefaults = {
+            User: {
+                First_Name: 'John',
+                Last_Name: 'Smith',
+                Email: 'john.smith@example.com',
+                // Custom fields directly on User for conditional access
+                EmergencyContactName: 'Jane Smith',
+                EmergencyContactRelationship: 'Spouse',
+                EmergencyContactCellPhone: '555-1234',
+                B4CJerseySize: 'Large',
+                TshirtSize: 'Large',
+                BibShortsSize: 'Large',
+                BibShortsInseam: 'Regular',
+                GloveSize: 'Large',
+                WaterBottle: 'Yes',
+                AverageSpeed: '15-17 mph',
+                FirstNightRoomType: 'Single',
+                FirstNightRoommateRequest: 'N/A',
+                RequireTransportation: 'Yes',
+                DepartureLocation: 'Brooklyn',
+                RequireTransportationHome: 'Yes',
+                ReturnLocation: 'Brooklyn',
+                RequireBikeTransportation: 'Yes',
+                BikeDropOffLocation: 'Lakewood',
+                RequireBikeTransportationHome: 'Yes',
+                BikeReturnLocation: 'Lakewood'
+            },
+            Primary_Registrant: {
+                First_Name: 'John',
+                Last_Name: 'Smith',
+                Registration_Fee: 350,
+                Registration_Fields: {
+                    'Commitment Amount': 5000
+                }
+            },
+            Donation: {
+                Amount: 100,
+                ID: '12345'
+            },
+            Payment: {
+                Amount_As_Money: '$450'
+            },
+            userAddress: {
+                Address1: '123 Main Street',
+                Address2: 'Apt 4B',
+                City: 'Brooklyn',
+                State: 'NY',
+                Zip: '11230'
+            }
+        };
+        
+        // List of custom field names
+        const customFieldNames = [
+            'EmergencyContactName', 'EmergencyContactRelationship', 'EmergencyContactCellPhone',
+            'B4CJerseySize', 'TshirtSize', 'BibShortsSize', 'BibShortsInseam', 'GloveSize',
+            'WaterBottle', 'AverageSpeed', 'FirstNightRoomType', 'FirstNightRoommateRequest',
+            'RequireTransportation', 'DepartureLocation', 'RequireTransportationHome',
+            'ReturnLocation', 'RequireBikeTransportation', 'BikeDropOffLocation',
+            'RequireBikeTransportationHome', 'BikeReturnLocation'
+        ];
+        
+        function extractLiquidVariables(html) {
+            // Extract unique variable paths from Liquid template
+            const variables = new Set();
+            
+            // Match {{...}} expressions
+            const pattern = /\{\{([^}]+)\}\}/g;
             let match;
             
-            // Extract {{ ... }} macros
-            while ((match = simplePattern.exec(html)) !== null) {
-                macros.add(match[1].trim());
-            }
-            
-            // Extract {% ... %} tags (for display purposes)
-            while ((match = tagPattern.exec(html)) !== null) {
-                const tag = match[1].trim();
-                // Extract variables from if/assign statements
-                const varMatch = tag.match(/assign\s+(\w+)\s*=/);
-                if (varMatch) {
-                    macros.add(varMatch[1]);
+            while ((match = pattern.exec(html)) !== null) {
+                const expression = match[1].trim();
+                
+                // Extract the base variable (before filters)
+                const baseVar = expression.split('|')[0].trim();
+                
+                // Handle dot notation (User.First_Name -> User and First_Name)
+                if (baseVar.includes('.')) {
+                    variables.add(baseVar);
+                } else {
+                    variables.add(baseVar);
+                }
+                
+                // Also check for field_by_api_name filter
+                const fieldMatch = expression.match(/field_by_api_name:\s*"([^"]+)"/);
+                if (fieldMatch) {
+                    variables.add(`User | field_by_api_name: "${fieldMatch[1]}"`);
+                }
+                
+                // Check for field_name filter
+                const fieldNameMatch = expression.match(/field_name:\s*"([^"]+)"/);
+                if (fieldNameMatch) {
+                    const obj = baseVar.split('|')[0].trim();
+                    variables.add(`${obj} | field_name: "${fieldNameMatch[1]}"`);
                 }
             }
             
-            return Array.from(macros);
+            // Also extract from {% if/elsif/unless %} conditionals
+            const conditionalPattern = /\{%\s*(?:if|elsif|unless)\s+([^%]+)%\}/g;
+            while ((match = conditionalPattern.exec(html)) !== null) {
+                const condition = match[1].trim();
+                
+                // Check for field_by_api_name in conditionals
+                const fieldMatch = condition.match(/User\s*\|\s*field_by_api_name:\s*"([^"]+)"/);
+                if (fieldMatch) {
+                    variables.add(`User | field_by_api_name: "${fieldMatch[1]}"`);
+                }
+                
+                // Check for field_name in conditionals
+                const fieldNameMatch = condition.match(/([\w.]+)\s*\|\s*field_name:\s*"([^"]+)"/);
+                if (fieldNameMatch) {
+                    variables.add(`${fieldNameMatch[1]} | field_name: "${fieldNameMatch[2]}"`);
+                }
+            }
+            
+            // Also extract from {% assign %} statements
+            const assignPattern = /\{%\s*assign\s+\w+\s*=\s*([^%]+)%\}/g;
+            while ((match = assignPattern.exec(html)) !== null) {
+                const expression = match[1].trim();
+                
+                // Check for field_by_api_name in assigns
+                const fieldMatch = expression.match(/User\s*\|\s*field_by_api_name:\s*"([^"]+)"/);
+                if (fieldMatch) {
+                    variables.add(`User | field_by_api_name: "${fieldMatch[1]}"`);
+                }
+                
+                // Check for field_name in assigns
+                const fieldNameMatch = expression.match(/([\w.]+)\s*\|\s*field_name:\s*"([^"]+)"/);
+                if (fieldNameMatch) {
+                    variables.add(`${fieldNameMatch[1]} | field_name: "${fieldNameMatch[2]}"`);
+                }
+            }
+            
+            return Array.from(variables).sort();
         }
         
         function parseTemplate() {
@@ -353,138 +525,284 @@
             }
             
             currentTemplate = template;
-            const macros = extractLiquidMacros(template);
+            const variables = extractLiquidVariables(template);
             
-            document.getElementById('macro-count').textContent = macros.length;
-            document.getElementById('unique-count').textContent = macros.length;
+            document.getElementById('macro-count').textContent = variables.length;
+            document.getElementById('unique-count').textContent = variables.length;
+            
+            // Initialize macro values with defaults
+            macroValues = {};
             
             // Generate form fields
             const form = document.getElementById('variables-form');
             form.innerHTML = '';
             
-            macros.forEach(macro => {
+            variables.forEach(varPath => {
                 const formGroup = document.createElement('div');
                 formGroup.className = 'form-group';
                 
                 const label = document.createElement('label');
-                label.textContent = macro;
+                label.textContent = varPath;
                 
                 const input = document.createElement('input');
                 input.type = 'text';
-                input.id = `macro-${btoa(macro)}`;
-                input.value = macroValues[macro] || sampleData[macro] || '';
-                input.placeholder = `Enter value for ${macro}`;
+                input.id = `macro-${btoa(varPath)}`;
+                
+               // Set default value
+                let defaultValue = '';
+                if (varPath.includes('field_by_api_name')) {
+                    // Extract field name from filter syntax
+                    const match = varPath.match(/"([^"]+)"/);
+                    if (match) {
+                        defaultValue = sampleDataDefaults.User[match[1]] || '';
+                    }
+                } else if (varPath.includes('field_name')) {
+                    // Extract field name from filter syntax
+                    const match = varPath.match(/"([^"]+)"/);
+                    if (match) {
+                        defaultValue = sampleDataDefaults.Primary_Registrant.Registration_Fields[match[1]] || '';
+                    }
+                } else {
+                    // Handle dot notation
+                    const parts = varPath.split('.');
+                    let val = sampleDataDefaults;
+                    for (let part of parts) {
+                        val = val?.[part];
+                    }
+                    defaultValue = val !== undefined ? val : '';
+                }
+                
+                input.value = defaultValue;
+                macroValues[varPath] = defaultValue;
+                
+                input.placeholder = `Enter value for ${varPath}`;
                 input.addEventListener('input', (e) => {
-                    macroValues[macro] = e.target.value;
+                    macroValues[varPath] = e.target.value;
                     updatePreview();
                 });
                 
                 formGroup.appendChild(label);
                 formGroup.appendChild(input);
                 form.appendChild(formGroup);
-                
-                // Store initial value
-                if (input.value) {
-                    macroValues[macro] = input.value;
-                }
             });
             
             updatePreview();
         }
         
-        function updatePreview() {
+        async function updatePreview() {
             if (!currentTemplate) {
                 return;
             }
             
-            let rendered = currentTemplate;
-            
-            // Replace all {{macro}} with values
-            Object.keys(macroValues).forEach(macro => {
-                const regex = new RegExp(`\\{\\{\\s*${macro.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\}\\}`, 'g');
-                rendered = rendered.replace(regex, macroValues[macro] || '');
-            });
-            
-            // Handle Liquid control structures for preview (simple version)
-            // Replace {% if X == "Yes" %} ... {% else %} ... {% endif %}
-            rendered = rendered.replace(/\{%\s*if\s+(\w+)\s*==\s*"Yes"\s*-?%\}(.*?)\{%\s*else\s*-?%\}(.*?)\{%\s*endif-?%\}/gs, (match, varName, yesContent, noContent) => {
-                // This is a simplified handler
-                return yesContent;
-            });
-            
-            // Remove remaining Liquid tags for cleaner preview
-            rendered = rendered.replace(/\{%.*?%\}/g, '');
-            
-            const iframe = document.getElementById('preview-frame');
-            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-            iframeDoc.open();
-            iframeDoc.write(rendered);
-            iframeDoc.close();
-        }
-        
-        function loadSample(type) {
-            if (type === 'welcome') {
-                fetch('template-to-clone.html')
-                    .then(r => r.text())
-                    .then(html => {
-                        document.getElementById('template-input').value = html;
-                        parseTemplate();
-                    })
-                    .catch(err => {
-                        alert('Could not load sample. Make sure template-to-clone.html is in the same directory.');
-                        console.error(err);
-                    });
-            } else if (type === 'form') {
-                fetch('to-update.html')
-                    .then(r => r.text())
-                    .then(html => {
-                        document.getElementById('template-input').value = html;
-                        parseTemplate();
-                    })
-                    .catch(err => {
-                        alert('Could not load sample. Make sure to-update.html is in the same directory.');
-                        console.error(err);
-                    });
+            try {
+                // Build context object for Liquid
+                const context = JSON.parse(JSON.stringify(sampleDataDefaults));
+                
+                // Override with user values
+                Object.keys(macroValues).forEach(key => {
+                    if (key.includes('field_by_api_name')) {
+                        // Extract field name and set on User object
+                        const match = key.match(/"([^"]+)"/);
+                        if (match) {
+                            context.User[match[1]] = macroValues[key];
+                        }
+                    } else if (key.includes('field_name')) {
+                        // Extract field name and set on Registration_Fields
+                        const match = key.match(/"([^"]+)"/);
+                        if (match) {
+                            context.Primary_Registrant.Registration_Fields[match[1]] = macroValues[key];
+                        }
+                    } else if (key.includes('.')) {
+                        // Handle dot notation
+                        const parts = key.split('.');
+                        let obj = context;
+                        for (let i = 0; i < parts.length - 1; i++) {
+                            if (!obj[parts[i]]) obj[parts[i]] = {};
+                            obj = obj[parts[i]];
+                        }
+                        const value = macroValues[key];
+                        // Try to parse as number if it looks like one
+                        obj[parts[parts.length - 1]] = isNaN(value) ? value : parseFloat(value) || value;
+                    } else {
+                        context[key] = macroValues[key];
+                    }
+                });
+                
+                // Preprocess template to convert filters in conditionals to direct property access
+                let processedTemplate = currentTemplate;
+                
+                // Convert {% if User | field_by_api_name: "FieldName" == "Value" %} to {% if User.FieldName == "Value" %}
+                processedTemplate = processedTemplate.replace(
+                    /\{%\s*(if|elsif|unless)\s+User\s*\|\s*field_by_api_name:\s*"([^"]+)"\s*(==|!=|contains|>=|<=|>|<)\s*"([^"]*)"\s*%\}/g,
+                    '{% $1 User.$2 $3 "$4" %}'
+                );
+                
+                // Convert {% if Primary_Registrant.Registration_Fields | field_name: "FieldName" ... %}
+                processedTemplate = processedTemplate.replace(
+                    /\{%\s*(if|elsif|unless)\s+Primary_Registrant\.Registration_Fields\s*\|\s*field_name:\s*"([^"]+)"\s*(==|!=|contains|>=|<=|>|<)\s*"([^"]*)"\s*%\}/g,
+                    '{% $1 Primary_Registrant.Registration_Fields["$2"] $3 "$4" %}'
+                );
+                
+                // Convert {% assign var = User | field_by_api_name: "FieldName" %} to {% assign var = User.FieldName %}
+                processedTemplate = processedTemplate.replace(
+                    /\{%\s*assign\s+(\w+)\s*=\s*User\s*\|\s*field_by_api_name:\s*"([^"]+)"\s*%\}/g,
+                    '{% assign $1 = User.$2 %}'
+                );
+                
+                // Render with Liquid engine
+                const rendered = await engine.parseAndRender(processedTemplate, context);
+                
+                const iframe = document.getElementById('preview-frame');
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                iframeDoc.open();
+                iframeDoc.write(rendered);
+                iframeDoc.close();
+            } catch (error) {
+                console.error('Liquid rendering error:', error);
+                const iframe = document.getElementById('preview-frame');
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                iframeDoc.open();
+                iframeDoc.write(`
+                    <div style="padding: 20px; background: #fee; border: 2px solid #c00; border-radius: 4px; margin: 20px; font-family: monospace;">
+                        <h3 style="color: #c00; margin-top: 0;">Liquid Rendering Error</h3>
+                        <pre style="white-space: pre-wrap; color: #333;">${error.message}</pre>
+                    </div>
+                `);
+                iframeDoc.close();
             }
         }
         
-        function exportHTML() {
+        async function exportHTML() {
             if (!currentTemplate) {
                 alert('Please parse a template first');
                 return;
             }
             
-            let rendered = currentTemplate;
-            Object.keys(macroValues).forEach(macro => {
-                const regex = new RegExp(`\\{\\{\\s*${macro.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\}\\}`, 'g');
-                rendered = rendered.replace(regex, macroValues[macro] || '');
-            });
-            
-            // Create download
-            const blob = new Blob([rendered], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'rendered-email.html';
-            a.click();
-            URL.revokeObjectURL(url);
+            try {
+                // Build context object for Liquid
+                const context = JSON.parse(JSON.stringify(sampleDataDefaults));
+                
+                // Override with user values
+                Object.keys(macroValues).forEach(key => {
+                    if (key.includes('field_by_api_name')) {
+                        // Extract field name and set on User object
+                        const match = key.match(/"([^"]+)"/);
+                        if (match) {
+                            context.User[match[1]] = macroValues[key];
+                        }
+                    } else if (key.includes('field_name')) {
+                        // Extract field name and set on Registration_Fields
+                        const match = key.match(/"([^"]+)"/);
+                        if (match) {
+                            context.Primary_Registrant.Registration_Fields[match[1]] = macroValues[key];
+                        }
+                    } else if (key.includes('.')) {
+                        const parts = key.split('.');
+                        let obj = context;
+                        for (let i = 0; i < parts.length - 1; i++) {
+                            if (!obj[parts[i]]) obj[parts[i]] = {};
+                            obj = obj[parts[i]];
+                        }
+                        const value = macroValues[key];
+                        obj[parts[parts.length - 1]] = isNaN(value) ? value : parseFloat(value) || value;
+                    } else {
+                        context[key] = macroValues[key];
+                    }
+                });
+                
+                // Preprocess template
+                let processedTemplate = currentTemplate;
+                processedTemplate = processedTemplate.replace(
+                    /\{%\s*(if|elsif|unless)\s+User\s*\|\s*field_by_api_name:\s*"([^"]+)"\s*(==|!=|contains|>=|<=|>|<)\s*"([^"]*)"\s*%\}/g,
+                    '{% $1 User.$2 $3 "$4" %}'
+                );
+                processedTemplate = processedTemplate.replace(
+                    /\{%\s*(if|elsif|unless)\s+Primary_Registrant\.Registration_Fields\s*\|\s*field_name:\s*"([^"]+)"\s*(==|!=|contains|>=|<=|>|<)\s*"([^"]*)"\s*%\}/g,
+                    '{% $1 Primary_Registrant.Registration_Fields["$2"] $3 "$4" %}'
+                );
+                processedTemplate = processedTemplate.replace(
+                    /\{%\s*assign\s+(\w+)\s*=\s*User\s*\|\s*field_by_api_name:\s*"([^"]+)"\s*%\}/g,
+                    '{% assign $1 = User.$2 %}'
+                );
+                
+                const rendered = await engine.parseAndRender(processedTemplate, context);
+                
+                // Create download
+                const blob = new Blob([rendered], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'rendered-email.html';
+                a.click();
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                alert('Error rendering template: ' + error.message);
+                console.error(error);
+            }
         }
         
-        function openInNewWindow() {
+        async function openInNewWindow() {
             if (!currentTemplate) {
                 alert('Please parse a template first');
                 return;
             }
             
-            let rendered = currentTemplate;
-            Object.keys(macroValues).forEach(macro => {
-                const regex = new RegExp(`\\{\\{\\s*${macro.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\}\\}`, 'g');
-                rendered = rendered.replace(regex, macroValues[macro] || '');
-            });
-            
-            const win = window.open('', '_blank');
-            win.document.write(rendered);
-            win.document.close();
+            try {
+                // Build context object for Liquid
+                const context = JSON.parse(JSON.stringify(sampleDataDefaults));
+                
+                // Override with user values
+                Object.keys(macroValues).forEach(key => {
+                    if (key.includes('field_by_api_name')) {
+                        // Extract field name and set on User object
+                        const match = key.match(/"([^"]+)"/);
+                        if (match) {
+                            context.User[match[1]] = macroValues[key];
+                        }
+                    } else if (key.includes('field_name')) {
+                        // Extract field name and set on Registration_Fields
+                        const match = key.match(/"([^"]+)"/);
+                        if (match) {
+                            context.Primary_Registrant.Registration_Fields[match[1]] = macroValues[key];
+                        }
+                    } else if (key.includes('.')) {
+                        const parts = key.split('.');
+                        let obj = context;
+                        for (let i = 0; i < parts.length - 1; i++) {
+                            if (!obj[parts[i]]) obj[parts[i]] = {};
+                            obj = obj[parts[i]];
+                        }
+                        const value = macroValues[key];
+                        obj[parts[parts.length - 1]] = isNaN(value) ? value : parseFloat(value) || value;
+                    } else {
+                        context[key] = macroValues[key];
+                    }
+                });
+                
+                // Preprocess template
+                let processedTemplate = currentTemplate;
+                processedTemplate = processedTemplate.replace(
+                    /\{%\s*(if|elsif|unless)\s+User\s*\|\s*field_by_api_name:\s*"([^"]+)"\s*(==|!=|contains|>=|<=|>|<)\s*"([^"]*)"\s*%\}/g,
+                    '{% $1 User.$2 $3 "$4" %}'
+                );
+                processedTemplate = processedTemplate.replace(
+                    /\{%\s*(if|elsif|unless)\s+Primary_Registrant\.Registration_Fields\s*\|\s*field_name:\s*"([^"]+)"\s*(==|!=|contains|>=|<=|>|<)\s*"([^"]*)"\s*%\}/g,
+                    '{% $1 Primary_Registrant.Registration_Fields["$2"] $3 "$4" %}'
+                );
+                processedTemplate = processedTemplate.replace(
+                    /\{%\s*assign\s+(\w+)\s*=\s*User\s*\|\s*field_by_api_name:\s*"([^"]+)"\s*%\}/g,
+                    '{% assign $1 = User.$2 %}'
+                );
+                
+                const rendered = await engine.parseAndRender(processedTemplate, context);
+                
+                const win = window.open('', '_blank');
+                win.document.write(rendered);
+                win.document.close();
+            } catch (error) {
+                alert('Error rendering template: ' + error.message);
+                console.error(error);
+            }
         }
     </script>
 </body>
